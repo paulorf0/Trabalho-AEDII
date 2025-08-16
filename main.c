@@ -2,7 +2,10 @@
 #include <stdio.h>
 
 
-int main(int argC, char** argV){
+int main(){
+
+  printf("kkkkk");
+
   return 0;
 }
 
