@@ -4,8 +4,6 @@
 
 int main(){
 
-  printf("kkkkk");
-
   return 0;
 }
 
