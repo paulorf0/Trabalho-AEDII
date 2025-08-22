@@ -2,9 +2,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-// Funções Privadas //
-int trocar_no_igual(info inf1, info inf2) {}
-// Funções Privadas //
 
 node *criarArvore() { return NULL; }
 
