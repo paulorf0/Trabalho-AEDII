@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <time.h>
+
 
 VetorOrdenado* vetor_criar(int capacidade_inicial) {
     VetorOrdenado *vetor = malloc(sizeof(VetorOrdenado));
@@ -20,6 +22,7 @@ VetorOrdenado* vetor_criar(int capacidade_inicial) {
     
     vetor->tamanho = 0;
     vetor->capacidade = capacidade_inicial;
+    vetor->tempo_total_insercao = 0.0;
     return vetor;
 
 }
@@ -34,6 +37,7 @@ void vetor_redimensionar(VetorOrdenado *vetor, int nova_capacidade) {
 }
 
 void vetor_inserir(VetorOrdenado *vetor, Entrada entrada) {
+
     if (vetor->tamanho >= vetor->capacidade) {
 
         vetor_redimensionar(vetor, vetor->capacidade * 2);
@@ -139,15 +143,87 @@ void vetor_liberar(VetorOrdenado *vetor) {
 }
 
 void vetor_imprimir(const VetorOrdenado *vetor) {
-
     printf("Vetor Ordenado (%d/%d):\n", vetor->tamanho, vetor->capacidade);
 
     for (int i = 0; i < vetor->tamanho; i++) {
 
-        printf("[%d] %s (Música: %s, Freq: %d/%d)\n", i, vetor->dados[i].palavra,
+        printf("[%d] %s (Musica: %s, Freq: %d/%d)\n", i, vetor->dados[i].palavra,
                                                          vetor->dados[i].nome_musica,
                                                          vetor->dados[i].freq_na_musica, 
                                                          vetor->dados[i].freq_total_repo);
     
     }
+}
+
+void processar_palavras_musica(VetorOrdenado *vetor, char **letra, const char *nome_musica, const char *nome_cantor) {
+    int inicio = 2;
+    
+    for (int i = inicio; letra[i] != NULL; i++) {
+        char *linha = strdup(letra[i]);
+        char *token = strtok(linha, " ,.!?;:\"()[]{}-\n");
+        
+        while (token != NULL) {
+            if (strlen(token) > 3) {
+                Entrada entrada;
+                entrada.palavra = strdup(token);
+                entrada.nome_musica = strdup(nome_musica);
+                entrada.nome_cantor = strdup(nome_cantor);
+                entrada.estrofe = NULL; 
+                entrada.freq_na_musica = 1;
+                entrada.freq_total_repo = 1;
+                
+                vetor_inserir(vetor, entrada);
+            }
+            token = strtok(NULL, " ,.!?;:\"()[]{}-\n");
+        }
+        free(linha);
+    }
+}
+
+double vetor_get_tempo_total(const VetorOrdenado *vetor) {
+    return vetor->tempo_total_insercao;
+}
+
+void vetor_reset_tempo(VetorOrdenado *vetor) {
+    vetor->tempo_total_insercao = 0.0;
+}
+
+double processar_palavras_musica_com_tempo(VetorOrdenado *vetor, char **letra, const char *nome_musica, const char *nome_cantor) {
+    clock_t inicio = clock();
+    
+    int inicio_linha = 2;
+    
+    for (int i = inicio_linha; letra[i] != NULL; i++) {
+        char *linha = strdup(letra[i]);
+        char *token = strtok(linha, " ,.!?;:\"()[]{}-\n");
+        
+        while (token != NULL) {
+            if (strlen(token) > 3) {
+                Entrada entrada;
+                entrada.palavra = strdup(token);
+                entrada.nome_musica = strdup(nome_musica);
+                entrada.nome_cantor = strdup(nome_cantor);
+                entrada.estrofe = NULL;
+                entrada.freq_na_musica = 1;
+                entrada.freq_total_repo = 1;
+                
+                vetor_inserir(vetor, entrada);
+            }
+            token = strtok(NULL, " ,.!?;:\"()[]{}-\n");
+        }
+        free(linha);
+    }
+    
+    clock_t fim = clock();
+    return ((double)(fim - inicio)) / CLOCKS_PER_SEC;
+}
+
+// Função para medir tempo real em segundos
+double get_real_time() {
+    return (double)clock() / CLOCKS_PER_SEC;
+}
+
+// Função para medir tempo decorrido
+double elapsed_time(double start, double end) {
+    return end - start;
 }

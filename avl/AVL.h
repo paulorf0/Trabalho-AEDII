@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 typedef struct {
  char *palavra;
 
@@ -13,17 +12,16 @@ typedef struct {
 
   // Frequência em todo o repo.
   int freq_total;
-}info;
+}infoAVL;
 
-typedef struct node {
+typedef struct nodeavl{
   int alt; // altura do nó
   
-  
-  info inf;
-  struct node *left;
-  struct node *right;
-} node;
+  infoAVL inf;
+  struct nodeavl *left;
+  struct nodeavl *right;
+} nodeAVL;
 
-node *criarArvore();
-info *buscarArvore(node *raiz, char *palavra);
-node *inserirArvore(node *raiz, info nova_info);
+nodeAVL *criarArvoreAVL();
+infoAVL *buscarArvoreAVL(nodeAVL *raiz, char *palavra);
+nodeAVL *inserirArvoreAVL(nodeAVL *raiz, infoAVL nova_info);

@@ -83,7 +83,7 @@ void to_lower(wchar_t *str) {
 }
 
 // Complexidade \approx O(47*n)
-void normalizar_linha(char *str) {
+void normalizar_linhaV2(char *str) {
   if (str == NULL)
     return;
 

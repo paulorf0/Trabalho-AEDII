@@ -8,25 +8,26 @@ int max(int a, int b)
   return (a > b) ? a : b;
 }
 
-int altura_no(node *n)
+int altura_no(nodeAVL *n)
 {
   if (n == NULL)
     return -1;
   return n->alt;
-}
+} 
 
-int coeficiente_balanceamento(node *node)
+
+int coeficiente_balanceamento(nodeAVL *node)
 {
-  int left = node->left == NULL ? -1 : node->left->alt;
-  int right = node->right == NULL ? -1 : node->right->alt;
-
+  int left = node->left == NULL ? 0 : node->left->alt;
+  int right = node->right == NULL ? 0 : node->right->alt;
   return left - right;
 }
 
-node *LR(node *x)
+
+nodeAVL *LR(nodeAVL *x)
 {
-  node *y = x->right;
-  node *z = y->left;
+  nodeAVL *y = x->right;
+  nodeAVL *z = y->left;
 
   y->left = x;
   x->right = z;
@@ -37,10 +38,10 @@ node *LR(node *x)
   return y;
 }
 
-node *RR(node *y)
+nodeAVL *RR(nodeAVL *y)
 {
-  node *x = y->left;
-  node *z = x->right;
+  nodeAVL *x = y->left;
+  nodeAVL *z = x->right;
 
   x->right = y;
   y->left = z;
@@ -52,9 +53,9 @@ node *RR(node *y)
 }
 // Funções Privadas //
 
-node *criarArvore() { return NULL; }
+nodeAVL *criarArvoreAVL() { return NULL; }
 
-info *buscarArvore(node *raiz, char *palavra)
+infoAVL *buscarArvoreAVL(nodeAVL *raiz, char *palavra)
 {
   if (raiz == NULL)
     return NULL;
@@ -79,11 +80,11 @@ info *buscarArvore(node *raiz, char *palavra)
 
 */
 
-node *inserirArvore(node *raiz, info inf)
+nodeAVL *inserirArvoreAVL(nodeAVL *raiz, infoAVL inf)
 {
   if (raiz == NULL)
   {
-    node *no = (node *)malloc(sizeof(node));
+    nodeAVL *no = (nodeAVL *)malloc(sizeof(nodeAVL));
     if (!no)
     {
       perror("Falha ao alocar memória para novo nó");
