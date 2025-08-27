@@ -1,27 +1,20 @@
 #include "BinaryTree.h"
-#include <string.h>
 #include <stdlib.h>
-
+#include <string.h>
 
 node *criarArvore() { return NULL; }
 
-info *buscarArvore(node *raiz, char *palavra)
-{
+inf *buscarArvore(node *raiz, char *palavra) {
   if (raiz == NULL)
     return NULL;
 
   int comparacao = strcmp(palavra, raiz->inf.palavra);
 
-  if (comparacao < 0)
-  {
+  if (comparacao < 0) {
     return buscarArvore(raiz->left, palavra);
-  }
-  else if (comparacao > 0)
-  {
+  } else if (comparacao > 0) {
     return buscarArvore(raiz->right, palavra);
-  }
-  else
-  {
+  } else {
     return &(raiz->inf);
   }
 }
@@ -30,13 +23,10 @@ info *buscarArvore(node *raiz, char *palavra)
 
 */
 
-node *inserirArvore(node *raiz, info inf)
-{
-  if (raiz == NULL)
-  {
+node *inserirArvore(node *raiz, inf inf) {
+  if (raiz == NULL) {
     node *no = (node *)malloc(sizeof(node));
-    if (!no)
-    {
+    if (!no) {
       perror("Falha ao alocar memória para novo nó");
       exit(1);
     }
@@ -51,20 +41,14 @@ node *inserirArvore(node *raiz, info inf)
 
   int comparacao = strcmp(inf.palavra, raiz->inf.palavra);
 
-  if (comparacao < 0)
-  {
+  if (comparacao < 0) {
     raiz->left = inserirArvore(raiz->left, inf);
-  }
-  else if (comparacao > 0)
-  {
+  } else if (comparacao > 0) {
     raiz->right = inserirArvore(raiz->right, inf);
-  }
-  else
-  {
+  } else {
     raiz->inf.freq_total += inf.freq;
 
-    if (inf.freq > raiz->inf.freq)
-    {
+    if (inf.freq > raiz->inf.freq) {
       free(raiz->inf.nome_musica);
       free(raiz->inf.nome_cantor);
       free(raiz->inf.estrofe);
@@ -75,9 +59,7 @@ node *inserirArvore(node *raiz, info inf)
       raiz->inf.freq = inf.freq;
 
       free(inf.palavra);
-    }
-    else
-    {
+    } else {
       free(inf.palavra);
       free(inf.nome_musica);
       free(inf.nome_cantor);

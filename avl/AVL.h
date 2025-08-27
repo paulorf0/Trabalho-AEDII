@@ -1,29 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifndef BINARY_TREE_H
+#define BINARY_TREE_H
 
-typedef struct {
- char *palavra;
+#include "../general.h"
 
-  // Dados da música
-  char *nome_musica;
-  char *nome_cantor;
-  char *estrofe;
-  int freq;
+#endif
 
-  // Frequência em todo o repo.
-  int freq_total;
-}info;
-
-typedef struct node {
+typedef struct nodeavl {
   int alt; // altura do nó
-  
-  
-  info inf;
-  struct node *left;
-  struct node *right;
-} node;
 
-node *criarArvore();
-info *buscarArvore(node *raiz, char *palavra);
-node *inserirArvore(node *raiz, info nova_info);
+  inf inf;
+  struct nodeavl *left;
+  struct nodeavl *right;
+} nodeAVL;
+
+nodeAVL *criarArvoreAVL();
+inf *buscarArvoreAVL(nodeAVL *raiz, char *palavra);
+nodeAVL *inserirArvoreAVL(nodeAVL *raiz, inf nova_inf);
