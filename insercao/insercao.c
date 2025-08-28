@@ -63,14 +63,16 @@ char **capturar_palavras(char *linha, char *delimitador, int *count) {
     tokens++;
     token = strtok(NULL, delimitador);
   }
-  *count = tokens;
+  if (count != NULL)
+    *count = tokens;
+
   free(copy1);
   copy1 = NULL;
 
   if (tokens == 0)
     return NULL;
 
-  char **split = malloc(sizeof(char *) * tokens);
+  char **split = malloc(sizeof(char *) * (tokens + 1));
   if (split == NULL)
     return NULL;
 
@@ -81,14 +83,96 @@ char **capturar_palavras(char *linha, char *delimitador, int *count) {
     split[i++] = strdup(token);
     token = strtok(NULL, delimitador);
   }
+  split[i] = NULL;
+
   free(copy2);
+  copy2 = NULL;
 
   return split;
 }
 
+int comparar(const void *a, const void *b) {
+  return strcmp(*(const char **)a, *(const char **)b);
+}
+
+void liberar_split(char **split) {
+  if (split == NULL) {
+    return;
+  }
+  for (int i = 0; split[i] != NULL; i++) {
+    free(split[i]); // Libera cada palavra (alocada com strdup)
+  }
+  free(split); // Libera o array de ponteiros
+}
+
+// Recebe o array de palavras da linha com split nos espaços.
+int frequencia_palavra_linha(const char *palavra, char **linha) {
+  if (palavra == NULL || linha == NULL)
+    return 0;
+
+  int i = 0;
+  int count = 0;
+
+  while (linha[i] != NULL)
+    if (strcmp(linha[i++], palavra) == 0)
+      count++;
+
+  return count;
+}
+
+int frequencia_palavra_texto(const char *palavra, char **texto) {
+  if (palavra == NULL || texto == NULL || *texto == NULL)
+    return 0;
+
+  int i = 0;
+  int count = 0;
+  while (texto[i] != NULL) {
+    char **split_linha = capturar_palavras(texto[i], " ", NULL);
+
+    if (split_linha != NULL) {
+      count += frequencia_palavra_linha(palavra, split_linha);
+
+      liberar_split(split_linha);
+    }
+
+    i++;
+  }
+  return count;
+}
+
 // Funções Privadas //
 
-float inserir_avl(nodeAVL *node, char **texto) {
+void inserir_estruturas(nodeAVL *nodeAVL, node *nodeBT, VetorOrdenado *vec,
+                        float *tAVL, float *tBT, float *tVec, char **musica) {
+
+  clock_t inicio, fim;
+  float periodo;
+  // INSERÇÃO AVL //
+  inicio = clock();
+
+  fim = clock();
+  periodo = ((float)(inicio - fim)) / CLOCKS_PER_SEC;
+  *tAVL = periodo;
+  // INSERÇÃO AVL //
+
+  // INSERÇÃO BT //
+  inicio = clock();
+
+  fim = clock();
+  periodo = ((float)(inicio - fim)) / CLOCKS_PER_SEC;
+  *tBT = periodo;
+  // INSERÇÃO BT //
+
+  // INSERÇÃO VEC //
+  inicio = clock();
+
+  fim = clock();
+  periodo = ((float)(inicio - fim)) / CLOCKS_PER_SEC;
+  *tVec = periodo;
+  // INSERÇÃO VEC ///
+}
+
+float inserir_avl(nodeAVL *node, inf *info) {
   clock_t inicio, fim;
   inicio = clock();
 
@@ -98,7 +182,7 @@ float inserir_avl(nodeAVL *node, char **texto) {
   return periodo;
 }
 
-float inserir_bT(node *no, char **texto) {
+float inserir_bT(node *no, inf *info) {
   clock_t inicio, fim;
   inicio = clock();
 
@@ -108,4 +192,5 @@ float inserir_bT(node *no, char **texto) {
   return periodo;
 }
 
+// NÃO FEITO.
 float inserir_vetor(VetorOrdenado *vec, char **texto);
