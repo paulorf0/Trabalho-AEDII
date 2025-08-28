@@ -154,6 +154,12 @@ inf *criar_dados(char *palavra, char *nome_compositor, char *nome_musica,
 
 // Funções Privadas //
 
+/*
+ * Essa função é extremamente pouco eficiente.
+ * frequencia_palavra_texto precisa iterar sobre toda a música, e isso é feito
+ * em cada palavra
+ */
+
 void inserir_estruturas(nodeAVL *nodeAVL, node *nodeBT, VetorOrdenado *vec,
                         float *tAVL, float *tBT, float *tVec, char **musica) {
 
@@ -193,6 +199,7 @@ void inserir_estruturas(nodeAVL *nodeAVL, node *nodeBT, VetorOrdenado *vec,
   // INSERÇÃO AVL //
 
   // INSERÇÃO BT //
+  i = 2;
   inicio = clock();
 
   while (musica[i] != NULL) {
@@ -232,26 +239,3 @@ void inserir_estruturas(nodeAVL *nodeAVL, node *nodeBT, VetorOrdenado *vec,
   free(dados_base->nome_musica);
   free(dados_base);
 }
-
-float inserir_avl(nodeAVL *node, inf *info) {
-  clock_t inicio, fim;
-  inicio = clock();
-
-  fim = clock();
-  float periodo = ((float)(inicio - fim)) / CLOCKS_PER_SEC;
-
-  return periodo;
-}
-
-float inserir_bT(node *no, inf *info) {
-  clock_t inicio, fim;
-  inicio = clock();
-
-  fim = clock();
-  float periodo = ((float)(inicio - fim)) / CLOCKS_PER_SEC;
-
-  return periodo;
-}
-
-// NÃO FEITO.
-float inserir_vetor(VetorOrdenado *vec, char **texto);
