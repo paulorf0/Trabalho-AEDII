@@ -23,8 +23,9 @@ inf *buscarArvore(node *raiz, char *palavra) {
 
 */
 
-node *inserirArvore(node *raiz, inf inf) {
-  if (raiz == NULL) {
+node *inserirArvore(node *no, const inf *dado_novo) {
+
+  if (no == NULL) {
     node *no = (node *)malloc(sizeof(node));
     if (!no) {
       perror("Falha ao alocar memória para novo nó");
@@ -33,39 +34,47 @@ node *inserirArvore(node *raiz, inf inf) {
     no->right = NULL;
     no->left = NULL;
 
-    no->inf = inf;
-    no->inf.freq_total = inf.freq;
+    no->inf.palavra = strdup(dado_novo->palavra);
+    no->inf.nome_musica = strdup(dado_novo->nome_musica);
+    no->inf.nome_cantor = strdup(dado_novo->nome_cantor);
+    no->inf.estrofe = strdup(dado_novo->estrofe);
+    no->inf.freq = dado_novo->freq;
+    no->inf.freq_total = dado_novo->freq;
+
+    // Verificação de erro no strdup.
+    if (!no->inf.palavra || !no->inf.nome_musica || !no->inf.nome_cantor ||
+        !no->inf.estrofe) {
+      free(no->inf.palavra);
+      free(no->inf.nome_musica);
+      free(no->inf.nome_cantor);
+      free(no->inf.estrofe);
+      free(no);
+      return NULL;
+    }
 
     return no;
   }
 
-  int comparacao = strcmp(inf.palavra, raiz->inf.palavra);
+  int comparacao = strcmp(dado_novo->palavra, no->inf.palavra);
 
   if (comparacao < 0) {
-    raiz->left = inserirArvore(raiz->left, inf);
+    no->left = inserirArvore(no->left, dado_novo);
   } else if (comparacao > 0) {
-    raiz->right = inserirArvore(raiz->right, inf);
+    no->right = inserirArvore(no->right, dado_novo);
   } else {
-    raiz->inf.freq_total += inf.freq;
+    no->inf.freq_total += dado_novo->freq;
 
-    if (inf.freq > raiz->inf.freq) {
-      free(raiz->inf.nome_musica);
-      free(raiz->inf.nome_cantor);
-      free(raiz->inf.estrofe);
+    if (dado_novo->freq > no->inf.freq) {
+      free(no->inf.nome_musica);
+      free(no->inf.nome_cantor);
+      free(no->inf.estrofe);
 
-      raiz->inf.nome_musica = inf.nome_musica;
-      raiz->inf.nome_cantor = inf.nome_cantor;
-      raiz->inf.estrofe = inf.estrofe;
-      raiz->inf.freq = inf.freq;
-
-      free(inf.palavra);
-    } else {
-      free(inf.palavra);
-      free(inf.nome_musica);
-      free(inf.nome_cantor);
-      free(inf.estrofe);
+      no->inf.nome_musica = strdup(dado_novo->nome_musica);
+      no->inf.nome_cantor = strdup(dado_novo->nome_cantor);
+      no->inf.estrofe = strdup(dado_novo->estrofe);
+      no->inf.freq = dado_novo->freq;
     }
   }
 
-  return raiz;
+  return no;
 }

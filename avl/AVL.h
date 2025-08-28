@@ -18,4 +18,4 @@ typedef struct nodeavl {
 
 nodeAVL *criarArvoreAVL();
 inf *buscarArvoreAVL(nodeAVL *raiz, char *palavra);
-nodeAVL *inserirArvoreAVL(nodeAVL *raiz, inf nova_inf);
+nodeAVL *inserirArvoreAVL(nodeAVL *raiz, const inf *nova_inf);

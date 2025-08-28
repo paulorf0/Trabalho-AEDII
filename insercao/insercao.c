@@ -12,7 +12,7 @@ inf *capturar_dados_compositor(char **text) {
   int caracteres = 0;
 
   inf *inform = (inf *)malloc(sizeof(inf));
-
+  inform->palavra = NULL;
   // COPIANDO NOME DA MÚSICA
   int nome_musicaLen = strlen(text[i]);
   inform->nome_musica = (char *)malloc(sizeof(char) * (nome_musicaLen + 1));
@@ -27,6 +27,7 @@ inf *capturar_dados_compositor(char **text) {
   char *linha1 = strdup(text[i]);
   caracteres += strlen(linha1);
 
+  // Capturando estrofe
   inform->estrofe = (char *)malloc(sizeof(char) * (caracteres + 1));
   strcpy(inform->estrofe, linha1);
 
@@ -140,15 +141,51 @@ int frequencia_palavra_texto(const char *palavra, char **texto) {
   return count;
 }
 
+inf *criar_dados(char *palavra, char *nome_compositor, char *nome_musica,
+                 char *estrofe) {
+  inf *dado = (inf *)malloc(sizeof(inf));
+  dado->nome_musica = strdup(nome_musica);
+  dado->nome_cantor = strdup(nome_compositor);
+  dado->palavra = strdup(palavra);
+  dado->estrofe = strdup(estrofe);
+
+  return dado;
+}
+
 // Funções Privadas //
 
 void inserir_estruturas(nodeAVL *nodeAVL, node *nodeBT, VetorOrdenado *vec,
                         float *tAVL, float *tBT, float *tVec, char **musica) {
 
+  inf *dados_base = capturar_dados_compositor(musica);
+
   clock_t inicio, fim;
   float periodo;
   // INSERÇÃO AVL //
+
+  int i = 2; // Duas primeiras linhas é de dados do autor.
+  int count_palavras = 0;
   inicio = clock();
+
+  while (musica[i] != NULL) {
+    char **palavras = capturar_palavras(musica[i], " ", &count_palavras);
+    for (int i = 0; i < count_palavras; i++) {
+      inf *dado = criar_dados(palavras[i], dados_base->nome_cantor,
+                              dados_base->nome_musica, dados_base->estrofe);
+
+      int freq = frequencia_palavra_texto(palavras[i], musica);
+      dado->freq = freq;
+
+      if (dado != NULL) {
+        inserir_avl(nodeAVL, dado);
+        free(dado->estrofe);
+        free(dado->nome_cantor);
+        free(dado->nome_musica);
+        free(dado->palavra);
+        free(dado);
+      }
+    }
+  }
 
   fim = clock();
   periodo = ((float)(inicio - fim)) / CLOCKS_PER_SEC;
@@ -157,6 +194,24 @@ void inserir_estruturas(nodeAVL *nodeAVL, node *nodeBT, VetorOrdenado *vec,
 
   // INSERÇÃO BT //
   inicio = clock();
+
+  while (musica[i] != NULL) {
+    char **palavras = capturar_palavras(musica[i], " ", &count_palavras);
+    for (int i = 0; i < count_palavras; i++) {
+      inf *dado = criar_dados(palavras[i], dados_base->nome_cantor,
+                              dados_base->nome_musica, dados_base->estrofe);
+      int freq = frequencia_palavra_texto(palavras[i], musica);
+      dado->freq = freq;
+      if (dado != NULL) {
+        inserirArvore(nodeBT, dado);
+        free(dado->estrofe);
+        free(dado->nome_cantor);
+        free(dado->nome_musica);
+        free(dado->palavra);
+        free(dado);
+      }
+    }
+  }
 
   fim = clock();
   periodo = ((float)(inicio - fim)) / CLOCKS_PER_SEC;
@@ -169,7 +224,13 @@ void inserir_estruturas(nodeAVL *nodeAVL, node *nodeBT, VetorOrdenado *vec,
   fim = clock();
   periodo = ((float)(inicio - fim)) / CLOCKS_PER_SEC;
   *tVec = periodo;
-  // INSERÇÃO VEC ///
+  // INSERÇÃO VEC //
+
+  free(dados_base->palavra);
+  free(dados_base->estrofe);
+  free(dados_base->nome_cantor);
+  free(dados_base->nome_musica);
+  free(dados_base);
 }
 
 float inserir_avl(nodeAVL *node, inf *info) {

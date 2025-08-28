@@ -16,4 +16,4 @@ typedef struct node {
 
 node *criarArvore();
 inf *buscarArvore(node *raiz, char *palavra);
-node *inserirArvore(node *raiz, inf nova_inf);
+node *inserirArvore(node *raiz, const inf *nova_inf);
