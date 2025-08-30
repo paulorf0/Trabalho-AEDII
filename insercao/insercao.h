@@ -8,7 +8,7 @@
 #include <string.h>
 #include <time.h>
 
-void inserir_estruturas(nodeAVL **nodeavl, node **nodeBT, VetorOrdenado *vec,
+void inserir_estruturas(nodeAVL **nodeavl, node **nodeBT, VetorOrdenado **vec,
                         float *tAVL, float *tBT, float *tVec, char **musica);
 
 #endif
