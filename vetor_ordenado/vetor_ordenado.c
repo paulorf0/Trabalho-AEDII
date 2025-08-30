@@ -121,6 +121,18 @@ inf *vetor_buscar(const VetorOrdenado *vetor, const char *palavra) {
   return NULL;
 }
 
+inf *vetor_buscar_freq(const VetorOrdenado *vetor, int freq) {
+  inf *dados = NULL;
+  for (int i = 0; i < vetor->tamanho; i++) {
+    if (vetor->dados->freq == freq) {
+      dados = vetor->dados;
+      break;
+    }
+  }
+
+  return dados;
+}
+
 void vetor_liberar(VetorOrdenado *vetor) {
 
   if (!vetor)

@@ -117,6 +117,9 @@ char **obter_musica(char *nome_arquivo, int *n) {
   int num_linhas = 0;
   char **texto = ler_arquivo(nome_arquivo, &num_linhas);
 
+  if (texto == NULL)
+    return NULL;
+
   if (n != NULL)
     *n = num_linhas;
 

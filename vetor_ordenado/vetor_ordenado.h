@@ -19,5 +19,6 @@ void vetor_liberar(VetorOrdenado *vetor);
 void vetor_redimensionar(VetorOrdenado *vetor, int nova_capacidade);
 bool vetor_vazio(const VetorOrdenado *vetor);
 void vetor_imprimir(const VetorOrdenado *vetor);
-
+inf *vetor_buscar_freq(const VetorOrdenado *vetor,
+                       int freq); // Busca Sequencial
 #endif

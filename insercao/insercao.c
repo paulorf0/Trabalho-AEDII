@@ -97,16 +97,6 @@ int comparar(const void *a, const void *b) {
   return strcmp(*(const char **)a, *(const char **)b);
 }
 
-void liberar_split(char **split) {
-  if (split == NULL) {
-    return;
-  }
-  for (int i = 0; split[i] != NULL; i++) {
-    free(split[i]); // Libera cada palavra (alocada com strdup)
-  }
-  free(split); // Libera o array de ponteiros
-}
-
 // Recebe o array de palavras da linha com split nos espaços.
 int frequencia_palavra_linha(const char *palavra, char **linha) {
   if (palavra == NULL || linha == NULL)
@@ -136,7 +126,7 @@ int frequencia_palavra_texto(const char *palavra, char **texto) {
     if (split_linha != NULL) {
       count += frequencia_palavra_linha(palavra, split_linha);
 
-      liberar_split(split_linha);
+      liberar_duplo(split_linha);
     }
 
     i++;
@@ -163,8 +153,12 @@ inf *criar_dados(char *palavra, char *nome_compositor, char *nome_musica,
  * em cada palavra
  */
 
-void inserir_estruturas(nodeAVL **nodeavl, node **nodeBT, VetorOrdenado **vec,
-                        float *tAVL, float *tBT, float *tVec, char **musica) {
+void inserir_estruturas(nodeAVL **nodeavl, nodeAVLFreq **nodeAvlFreq,
+                        node **nodeBT, nodeFreq **nodeBTFreq,
+                        VetorOrdenado **vec, float *tAVL, float *tBT,
+                        float *tVec, char **musica)
+
+{
 
   inf *dados_base = capturar_dados_compositor(musica);
   if (dados_base == NULL) {
@@ -196,7 +190,7 @@ void inserir_estruturas(nodeAVL **nodeavl, node **nodeBT, VetorOrdenado **vec,
         free(dado->palavra);
         free(dado);
       }
-      liberar_split(palavras);
+      liberar_duplo(palavras);
     }
   }
 
@@ -205,6 +199,30 @@ void inserir_estruturas(nodeAVL **nodeavl, node **nodeBT, VetorOrdenado **vec,
   if (tAVL != NULL)
     *tAVL = periodo;
   // INSERÇÃO AVL //
+
+  // INSERINDO POR FREQUENCIA EM AVL //
+  for (int i = 2; musica[i] != NULL; i++) {
+    char **palavras = capturar_palavras(musica[i], " ", &count_palavras);
+    if (palavras) {
+      for (int j = 0; palavras[j] != NULL; j++) {
+        if (strlen(palavras[j]) < 3)
+          continue;
+
+        inf *dado = criar_dados(palavras[j], dados_base->nome_cantor,
+                                dados_base->nome_musica, dados_base->estrofe);
+        dado->freq = frequencia_palavra_texto(palavras[j], musica);
+
+        *nodeAvlFreq = inserirArvoreAVLFreq(*nodeAvlFreq, dado);
+        free(dado->estrofe);
+        free(dado->nome_cantor);
+        free(dado->nome_musica);
+        free(dado->palavra);
+        free(dado);
+      }
+      liberar_duplo(palavras);
+    }
+  }
+  // INSERINDO POR FREQUENCIA EM AVL //
 
   // INSERÇÃO BT //
 
@@ -227,7 +245,7 @@ void inserir_estruturas(nodeAVL **nodeavl, node **nodeBT, VetorOrdenado **vec,
       free(dado->palavra);
       free(dado);
     }
-    liberar_split(palavras);
+    liberar_duplo(palavras);
   }
 
   fim = clock();
@@ -235,6 +253,27 @@ void inserir_estruturas(nodeAVL **nodeavl, node **nodeBT, VetorOrdenado **vec,
   if (tBT != NULL)
     *tBT = periodo;
   // INSERÇÃO BT //
+
+  // INSERÇÃO BT FREQ //
+  for (int i = 2; musica[i] != NULL; i++) {
+    char **palavras = capturar_palavras(musica[i], " ", &count_palavras);
+    for (int j = 0; j < count_palavras; j++) {
+      if (strlen(palavras[j]) < 3)
+        continue;
+      inf *dado = criar_dados(palavras[j], dados_base->nome_cantor,
+                              dados_base->nome_musica, dados_base->estrofe);
+      int freq = frequencia_palavra_texto(palavras[j], musica);
+      dado->freq = freq;
+
+      *nodeBTFreq = inserirArvoreFreq(*nodeBTFreq, dado);
+      free(dado->estrofe);
+      free(dado->nome_cantor);
+      free(dado->nome_musica);
+      free(dado->palavra);
+      free(dado);
+    }
+    liberar_duplo(palavras);
+  }
 
   // INSERÇÃO VEC //
   inicio = clock();
@@ -256,7 +295,7 @@ void inserir_estruturas(nodeAVL **nodeavl, node **nodeBT, VetorOrdenado **vec,
       free(dado->palavra);
       free(dado);
     }
-    liberar_split(palavras);
+    liberar_duplo(palavras);
   }
 
   fim = clock();
@@ -270,4 +309,73 @@ void inserir_estruturas(nodeAVL **nodeavl, node **nodeBT, VetorOrdenado **vec,
   free(dados_base->nome_cantor);
   free(dados_base->nome_musica);
   free(dados_base);
+}
+
+inf *buscar_informacao(nodeAVL **nodeavl, nodeAVLFreq **nodeAvlFreq,
+                       node **nodeBT, nodeFreq **nodeBTFreq,
+                       VetorOrdenado **vec, float *tAVL, float *tBT,
+                       float *tVec, char *palavra, int *freq) {
+
+  clock_t inicio, fim;
+  float periodo;
+  if (palavra != NULL) {
+    inicio = clock();
+    inf *dados_encontrados_vec = vetor_buscar(*vec, palavra);
+    fim = clock();
+    periodo = ((float)(fim - inicio)) / CLOCKS_PER_SEC;
+    if (tVec != NULL) {
+      *tVec = periodo;
+    }
+
+    inicio = clock();
+    inf *dados_encontrados_bt = buscarArvore(*nodeBT, palavra);
+    fim = clock();
+    periodo = ((float)(fim - inicio)) / CLOCKS_PER_SEC;
+    if (tBT != NULL) {
+      *tBT = periodo;
+    }
+
+    // -- AVL --
+    inicio = clock();
+    inf *dados_encontrados_avl = buscarArvoreAVL(*nodeavl, palavra);
+    fim = clock();
+    periodo = ((float)(fim - inicio)) / CLOCKS_PER_SEC;
+    if (tAVL != NULL) {
+      *tAVL = periodo;
+    }
+    // -- AVL -- //
+
+    return dados_encontrados_avl;
+  } else if (freq != NULL) {
+    // -- AVL -- //
+    inicio = clock();
+    inf *dados_encontrados_vec_freq = vetor_buscar_freq(*vec, *freq);
+    fim = clock();
+    periodo = ((float)(fim - inicio)) / CLOCKS_PER_SEC;
+    if (tVec != NULL) {
+      *tVec = periodo;
+    }
+    // -- AVL --//
+
+    // -- BINARY TREE -- //
+    inicio = clock();
+    inf *dados_encontrados_bt_freq = buscarArvoreFreq(*nodeBTFreq, *freq);
+    fim = clock();
+    periodo = ((float)(fim - inicio)) / CLOCKS_PER_SEC;
+    if (tBT != NULL) {
+      *tBT = periodo;
+    }
+
+    inicio = clock();
+    inf *dados_encontrados_avl_freq = buscarArvoreAVLFreq(*nodeAvlFreq, *freq);
+    fim = clock();
+    periodo = ((float)(fim - inicio)) / CLOCKS_PER_SEC;
+    if (tAVL != NULL) {
+      *tAVL = periodo;
+    }
+    // BINARY TREE //
+    return dados_encontrados_bt_freq;
+  }
+
+  return NULL;
 }
