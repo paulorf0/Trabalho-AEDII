@@ -1,14 +1,13 @@
+#ifndef TRATAMENTO_MUSICA_H
+#define TRATAMENTO_MUSICA_H
 
-#include <wctype.h> 
-#include <wchar.h> 
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <locale.h>
+#include <wchar.h>
+#include <wctype.h>
 
-char **ler_arquivo(const char *nome_arquivo, int *num_linhas);
-// Complexidade O(n*47)
-void retirar_acento(wchar_t *str);
+char **obter_musica(char *nome_arquivo, int *n);
 
-// Complexidade O(n)
-void to_lower(wchar_t *str);
+#endif

@@ -1,0 +1,1 @@
+gcc -c insercao/*.c binary_tree/*.c avl/*.c tratamento_musica/*.c ; gcc main.c *.o ;./a.out

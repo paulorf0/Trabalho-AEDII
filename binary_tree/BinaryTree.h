@@ -1,12 +1,10 @@
-#include <stdio.h>
-#include <stdlib.h>
 
 #ifndef BINARY_TREE_H
 #define BINARY_TREE_H
 
 #include "../general.h"
-
-#endif
+#include <stdio.h>
+#include <stdlib.h>
 
 typedef struct node {
   inf inf;
@@ -17,3 +15,7 @@ typedef struct node {
 node *criarArvore();
 inf *buscarArvore(node *raiz, char *palavra);
 node *inserirArvore(node *raiz, const inf *nova_inf);
+void percorrerArvore(node *raiz);
+void liberarArvore(node *raiz);
+
+#endif

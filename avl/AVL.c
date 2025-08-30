@@ -12,35 +12,36 @@ int altura_no(nodeAVL *n) {
 }
 
 int coeficiente_balanceamento(nodeAVL *node) {
-  int left = node->left == NULL ? 0 : node->left->alt;
-  int right = node->right == NULL ? 0 : node->right->alt;
-  return left - right;
-}
-
-nodeAVL *LR(nodeAVL *x) {
-  nodeAVL *y = x->right;
-  nodeAVL *z = y->left;
-
-  y->left = x;
-  x->right = z;
-
-  x->alt = 1 + max(altura_no(x->left), altura_no(x->right));
-  y->alt = 1 + max(altura_no(y->left), altura_no(y->right));
-
-  return y;
+  if (node == NULL) {
+    return 0;
+  }
+  return altura_no(node->left) - altura_no(node->right);
 }
 
 nodeAVL *RR(nodeAVL *y) {
   nodeAVL *x = y->left;
-  nodeAVL *z = x->right;
+  nodeAVL *T2 = x->right;
 
   x->right = y;
-  y->left = z;
+  y->left = T2;
 
-  x->alt = 1 + max(altura_no(x->left), altura_no(x->right));
-  y->alt = 1 + max(altura_no(y->left), altura_no(y->right));
+  y->alt = max(altura_no(y->left), altura_no(y->right)) + 1;
+  x->alt = max(altura_no(x->left), altura_no(x->right)) + 1;
 
   return x;
+}
+
+nodeAVL *LR(nodeAVL *x) {
+  nodeAVL *y = x->right;
+  nodeAVL *T2 = y->left;
+
+  y->left = x;
+  x->right = T2;
+
+  x->alt = max(altura_no(x->left), altura_no(x->right)) + 1;
+  y->alt = max(altura_no(y->left), altura_no(y->right)) + 1;
+
+  return y;
 }
 // Funções Privadas //
 
@@ -69,7 +70,7 @@ nodeAVL *inserirArvoreAVL(nodeAVL *raiz, const inf *dado_novo) {
   if (raiz == NULL) {
     nodeAVL *no = (nodeAVL *)malloc(sizeof(nodeAVL));
     if (!no) {
-      perror("Falha ao alocar memória para novo nó");
+      printf("\n--ERRO DE ALOCACAO | AVL\n");
       exit(1);
     }
     no->right = NULL;
@@ -86,6 +87,7 @@ nodeAVL *inserirArvoreAVL(nodeAVL *raiz, const inf *dado_novo) {
     // Verifique se strdup falhou
     if (!no->inf.palavra || !no->inf.nome_musica || !no->inf.nome_cantor ||
         !no->inf.estrofe) {
+      printf("\n--ERRO NO STRDUP | AVL--\n");
       free(no->inf.palavra);
       free(no->inf.nome_musica);
       free(no->inf.nome_cantor);
@@ -139,4 +141,28 @@ nodeAVL *inserirArvoreAVL(nodeAVL *raiz, const inf *dado_novo) {
     }
   }
   return raiz;
+}
+
+void percorrerArvoreAVL(nodeAVL *raiz) {
+  if (raiz == NULL)
+    return;
+
+  percorrerArvoreAVL(raiz->left);
+  printf("  - Palavra: %s (Freq: %d, Alt: %d)\n", raiz->inf.palavra,
+         raiz->inf.freq_total, raiz->alt);
+  percorrerArvoreAVL(raiz->right);
+}
+
+void liberarArvoreAVL(nodeAVL *raiz) {
+  if (raiz == NULL)
+    return;
+
+  liberarArvoreAVL(raiz->left);
+  liberarArvoreAVL(raiz->right);
+
+  free(raiz->inf.palavra);
+  free(raiz->inf.nome_musica);
+  free(raiz->inf.nome_cantor);
+  free(raiz->inf.estrofe);
+  free(raiz);
 }

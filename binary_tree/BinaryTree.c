@@ -78,3 +78,27 @@ node *inserirArvore(node *no, const inf *dado_novo) {
 
   return no;
 }
+
+void percorrerArvore(node *raiz) {
+  if (raiz == NULL)
+    return;
+
+  percorrerArvore(raiz->left);
+  printf("  - Palavra: %s (Freq: %d)\n", raiz->inf.palavra,
+         raiz->inf.freq_total);
+  percorrerArvore(raiz->right);
+}
+
+void liberarArvore(node *raiz) {
+  if (raiz == NULL)
+    return;
+
+  liberarArvore(raiz->left);
+  liberarArvore(raiz->right);
+
+  free(raiz->inf.palavra);
+  free(raiz->inf.nome_musica);
+  free(raiz->inf.nome_cantor);
+  free(raiz->inf.estrofe);
+  free(raiz);
+}

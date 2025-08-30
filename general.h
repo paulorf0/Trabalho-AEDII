@@ -1,3 +1,6 @@
+#ifndef GENERAL_H
+#define GENERAL_H
+
 typedef struct {
   char *palavra;
 
@@ -10,3 +13,5 @@ typedef struct {
   // Frequência em todo o repo.
   int freq_total;
 } inf;
+
+#endif

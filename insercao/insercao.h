@@ -1,14 +1,14 @@
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
+#ifndef INSERCAO_H
+#define INSERCAO_H
 
 #include "../avl/AVL.h"
 #include "../binary_tree/BinaryTree.h"
 #include "../vetor_ordenado/vetor_ordenado.h"
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
-// Retorna o tempo para inserção na avl
-float inserir_avl(nodeAVL *node, inf *info);
-// Retorna o tempo para inserção na árvore binária.
-float inserir_bT(node *no, inf *info);
-// Retorna o tempo para inserção no vetor ordenado.
-float inserir_vetor(VetorOrdenado *vec, inf *info);
+void inserir_estruturas(nodeAVL **nodeavl, node **nodeBT, VetorOrdenado *vec,
+                        float *tAVL, float *tBT, float *tVec, char **musica);
+
+#endif
