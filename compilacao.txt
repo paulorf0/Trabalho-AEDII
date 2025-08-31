@@ -1,4 +1,0 @@
-
-gcc -c binary_tree/*.c avl/*.c insercao/*.c tratamento_musica/*.c vetor_ordenado/*.c ; gcc main.c *.o ; ./a.out
-
-
