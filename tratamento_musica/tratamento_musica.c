@@ -128,9 +128,5 @@ char **obter_musica(char *nome_arquivo, int *n) {
       normalizar_linha(texto[i]);
   }
 
-  for (int i = 0; texto[i] != NULL; i++) {
-    printf("%d. %s\n", i, texto[i]);
-  }
-
   return texto;
 }
