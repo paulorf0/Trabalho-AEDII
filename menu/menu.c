@@ -19,12 +19,6 @@ void opcoes() {
 
 // Define o tamanho do buffer para captura de opção ou frequência.
 int capturar_valor(const int p) {
-  // char buffer[p];
-  // int n = 0;
-  //
-  // if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
-  //   n = atoi(buffer);
-  // }
   int n = 0;
   scanf("%d", &n);
 
@@ -83,14 +77,19 @@ void menu(nodeAVL **nodeavl, node **nodeBT, VetorOrdenado **vec,
         continue;
       }
 
+      char **minha_lista_processadas = NULL;
+      int meu_contador_processado = 0;
+
       float tAVL = 0, tBT = 0, tVec = 0;
       inserir_estruturas(nodeavl, nodeAvlF, nodeBT, nodeF, vec, &tAVL, &tBT,
-                         &tVec, musica);
+                         &tVec, musica, &minha_lista_processadas,
+                         &meu_contador_processado);
       printf("\n--     MUSICA INSERIDA       --\n");
       printf("--      Tempo Vetor:     %f  -- \n", tVec);
       printf("--      Tempo  AVL:      %f  -- \n", tAVL);
       printf("-- Tempo Arvore Binaria: %f  -- \n", tBT);
-
+      free(nome);
+      liberar_duplo(musica);
       break;
     case 2:
       printf("\n-- BUSCAR POR PALAVRA -- \n");
@@ -105,7 +104,7 @@ void menu(nodeAVL **nodeavl, node **nodeBT, VetorOrdenado **vec,
 
       printf("\n--          DADOS         --\n");
       printf("Nome Cantor: %s\nNome Musica: %s\n Frequencia: %d\n Frequencia "
-             "no repositorio: %d\n\n Estrofe:\n%s",
+             "no repositorio: %d\n\nEstrofe:\n%s",
              info->nome_cantor, info->nome_musica, info->freq, info->freq_total,
              info->estrofe);
 
@@ -118,31 +117,19 @@ void menu(nodeAVL **nodeavl, node **nodeBT, VetorOrdenado **vec,
       inf *infoFreq = buscar_informacao(nodeavl, nodeAvlF, nodeBT, nodeF, vec,
                                         &tAVL, &tBT, &tVec, NULL, &freq);
       if (infoFreq == NULL) {
-        printf("\n-- PALAVRA NAO REGISTRADA --\n");
+        printf("\n-- SEM FREQUENCIA --\n");
         continue;
       }
 
       printf("\n--          DADOS         --\n");
-      printf("Nome Cantor: %s\nNome Musica: %s\nFrequencia: %d\nFrequencia "
+      printf("Palavra: %s\nNome Cantor: %s\nNome Musica: %s\nFrequencia: "
+             "%d\nFrequencia "
              "no repositorio: %d\n\n Estrofe:\n%s",
-             infoFreq->nome_cantor, info->nome_musica, info->freq,
-             info->freq_total, infoFreq->estrofe);
+             infoFreq->palavra, infoFreq->nome_cantor, infoFreq->nome_musica,
+             infoFreq->freq, infoFreq->freq_total, infoFreq->estrofe);
       break;
     default:
       continue;
     }
   }
-}
-
-int main() {
-
-  nodeAVL *raizAVL = criarArvoreAVL();  // Retorna NULL
-  node *raizBT = criarArvore();         // Retorna NULL
-  VetorOrdenado *vec = vetor_criar(20); // Não será usado no teste
-  nodeAVLFreq *raizAVLF = criarArvoreAVLFreq();
-  nodeFreq *raizBTF = criarArvoreFreq();
-
-  menu(&raizAVL, &raizBT, &vec, &raizAVLF, &raizBTF);
-
-  return 0;
 }

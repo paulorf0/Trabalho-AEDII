@@ -136,7 +136,7 @@ int frequencia_palavra_texto(const char *palavra, char **texto) {
 
 inf *criar_dados(char *palavra, char *nome_compositor, char *nome_musica,
                  char *estrofe) {
-  inf *dado = (inf *)calloc(1, sizeof(inf));
+  inf *dado = (inf *)malloc(sizeof(inf));
   dado->nome_musica = strdup(nome_musica);
   dado->nome_cantor = strdup(nome_compositor);
   dado->palavra = strdup(palavra);
@@ -166,21 +166,18 @@ void inserir_estruturas(nodeAVL **nodeavl, nodeAVLFreq **nodeAvlFreq,
     return;
   }
 
-  if (tAVL != NULL)
-    *tAVL = 0;
-  if (tVec != NULL)
-    *tVec = 0;
-  if (tBT != NULL)
-    *tBT = 0;
-
   clock_t inicio, fim;
   float periodo;
+  // INSERÇÃO AVL //
 
   int count_palavras = 0;
   inicio = clock();
 
   char ***processadas = processadas_ptr;
   int *count_processado = count_processado_ptr;
+
+  *processadas = (char **)realloc(*processadas,
+                                  sizeof(char *) * ((*count_processado) + 1));
 
   for (int i = 2; musica[i] != NULL; i++) {
 
@@ -203,44 +200,179 @@ void inserir_estruturas(nodeAVL **nodeavl, nodeAVLFreq **nodeAvlFreq,
                                 dados_base->nome_musica, dados_base->estrofe);
         dado->freq = frequencia_palavra_texto(palavras[j], musica);
 
-        inicio = clock();
         *nodeavl = inserirArvoreAVL(*nodeavl, dado);
-        fim = clock();
-        periodo = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
-        if (tAVL != NULL)
-          *tAVL += periodo;
 
-        inicio = clock();
-        *vec = vetor_inserir(*vec, dado);
-        fim = clock();
-        periodo = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
-        if (tVec != NULL)
-          *tVec += periodo;
-
-        inicio = clock();
-        *nodeBT = inserirArvore(*nodeBT, dado);
-        fim = clock();
-        periodo = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
-        if (tBT != NULL)
-          *tBT += periodo;
-
-        *nodeBTFreq = inserirArvoreFreq(*nodeBTFreq, dado);
-
-        *nodeAvlFreq = inserirArvoreAVLFreq(*nodeAvlFreq, dado);
-
-        *processadas = (char **)realloc(
-            *processadas, sizeof(char *) * (*count_processado + 1));
-        if (*processadas == NULL) {
-          // Tratamento de erro de memória
-          exit(1);
-        }
         (*processadas)[*count_processado] = strdup(palavras[j]);
         (*count_processado)++;
+
+        free(dado->estrofe);
+        free(dado->nome_cantor);
+        free(dado->nome_musica);
+        free(dado->palavra);
+        free(dado);
       }
       liberar_duplo(palavras);
     }
   }
 
+  fim = clock();
+  periodo = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
+  if (tAVL != NULL)
+    *tAVL = periodo;
+  // INSERÇÃO AVL //
+
+  count_processado = 0;
+  // INSERINDO POR FREQUENCIA EM AVL //
+  for (int i = 2; musica[i] != NULL; i++) {
+    char **palavras = capturar_palavras(musica[i], " ", &count_palavras);
+    if (palavras) {
+      for (int j = 0; palavras[j] != NULL; j++) {
+        if (strlen(palavras[j]) < 3)
+          continue;
+
+        int existe = 0;
+        for (int k = 0; k < count_processado; k++)
+          if (strcmp(processadas[k], palavras[j]) == 0) {
+            existe = 1;
+            break;
+          }
+        if (existe)
+          continue;
+
+        inf *dado = criar_dados(palavras[j], dados_base->nome_cantor,
+                                dados_base->nome_musica, dados_base->estrofe);
+        dado->freq = frequencia_palavra_texto(palavras[j], musica);
+
+        *nodeAvlFreq = inserirArvoreAVLFreq(*nodeAvlFreq, dado);
+        count_processado++;
+
+        free(dado->estrofe);
+        free(dado->nome_cantor);
+        free(dado->nome_musica);
+        free(dado->palavra);
+        free(dado);
+      }
+      liberar_duplo(palavras);
+    }
+  }
+  // INSERINDO POR FREQUENCIA EM AVL //
+
+  // INSERÇÃO BT //
+
+  inicio = clock();
+  count_processado = 0;
+  for (int i = 2; musica[i] != NULL; i++) {
+    char **palavras = capturar_palavras(musica[i], " ", &count_palavras);
+    for (int j = 0; j < count_palavras; j++) {
+      if (strlen(palavras[j]) < 3)
+        continue;
+
+      int existe = 0;
+
+      for (int k = 0; k < count_processado; k++)
+        if (strcmp(processadas[k], palavras[j]) == 0) {
+          existe = 1;
+          break;
+        }
+      if (existe)
+        continue;
+
+      inf *dado = criar_dados(palavras[j], dados_base->nome_cantor,
+                              dados_base->nome_musica, dados_base->estrofe);
+      int freq = frequencia_palavra_texto(palavras[j], musica);
+      dado->freq = freq;
+
+      *nodeBT = inserirArvore(*nodeBT, dado);
+      count_processado++;
+
+      free(dado->estrofe);
+      free(dado->nome_cantor);
+      free(dado->nome_musica);
+      free(dado->palavra);
+      free(dado);
+    }
+    liberar_duplo(palavras);
+  }
+
+  fim = clock();
+  periodo = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
+  if (tBT != NULL)
+    *tBT = periodo;
+  // INSERÇÃO BT //
+
+  // INSERÇÃO BT FREQ //
+  count_processado = 0;
+  for (int i = 2; musica[i] != NULL; i++) {
+    char **palavras = capturar_palavras(musica[i], " ", &count_palavras);
+    for (int j = 0; j < count_palavras; j++) {
+      if (strlen(palavras[j]) < 3)
+        continue;
+      int existe = 0;
+      for (int k = 0; k < count_processado; k++)
+        if (strcmp(processadas[k], palavras[j]) == 0) {
+          existe = 1;
+          break;
+        }
+      if (existe)
+        continue;
+
+      inf *dado = criar_dados(palavras[j], dados_base->nome_cantor,
+                              dados_base->nome_musica, dados_base->estrofe);
+      int freq = frequencia_palavra_texto(palavras[j], musica);
+      dado->freq = freq;
+
+      *nodeBTFreq = inserirArvoreFreq(*nodeBTFreq, dado);
+
+      count_processado++;
+      free(dado->estrofe);
+      free(dado->nome_cantor);
+      free(dado->nome_musica);
+      free(dado->palavra);
+      free(dado);
+    }
+    liberar_duplo(palavras);
+  }
+
+  // INSERÇÃO VEC //
+  inicio = clock();
+  count_processado = 0;
+  for (int i = 2; musica[i] != NULL; i++) {
+    char **palavras = capturar_palavras(musica[i], " ", &count_palavras);
+    for (int j = 0; j < count_palavras; j++) {
+      if (strlen(palavras[j]) < 3)
+        continue;
+
+      int existe = 0;
+      for (int k = 0; k < count_processado; k++)
+        if (strcmp(processadas[k], palavras[j]) == 0) {
+          existe = 1;
+          break;
+        }
+      if (existe)
+        continue;
+      inf *dado = criar_dados(palavras[j], dados_base->nome_cantor,
+                              dados_base->nome_musica, dados_base->estrofe);
+      int freq = frequencia_palavra_texto(palavras[j], musica);
+      dado->freq = freq;
+
+      *vec = vetor_inserir(*vec, dado);
+      count_processado++;
+      free(dado->estrofe);
+      free(dado->nome_cantor);
+      free(dado->nome_musica);
+      free(dado->palavra);
+      free(dado);
+    }
+    liberar_duplo(palavras);
+  }
+
+  fim = clock();
+  periodo = ((float)(fim - inicio)) / CLOCKS_PER_SEC;
+  if (tVec != NULL)
+    *tVec = periodo;
+  // INSERÇÃO VEC //
+
+  liberar_duplo(processadas);
   free(dados_base->palavra);
   free(dados_base->estrofe);
   free(dados_base->nome_cantor);

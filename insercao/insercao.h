@@ -14,7 +14,8 @@
 void inserir_estruturas(nodeAVL **nodeavl, nodeAVLFreq **nodeAvlFreq,
                         node **nodeBT, nodeFreq **nodeBTFreq,
                         VetorOrdenado **vec, float *tAVL, float *tBT,
-                        float *tVec, char **musica);
+                        float *tVec, char **musica, char ***processadas_ptr,
+                        int *count_processado_ptr);
 inf *buscar_informacao(nodeAVL **nodeavl, nodeAVLFreq **nodeAvlFreq,
                        node **nodeBT, nodeFreq **nodeBTFreq,
                        VetorOrdenado **vec, float *tAVL, float *tBT,

@@ -103,7 +103,6 @@ nodeAVLFreq *inserirArvoreAVLFreq(nodeAVLFreq *raiz, const inf *dado_novo) {
   } else if (comparacao > 0) {
     raiz->right = inserirArvoreAVLFreq(raiz->right, dado_novo);
   } else {
-    raiz->inf.freq_total += dado_novo->freq;
 
     if (dado_novo->freq > raiz->inf.freq) {
       free(raiz->inf.nome_musica);

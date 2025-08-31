@@ -100,7 +100,7 @@ void normalizar_linha(char *str) {
     return;
 
   const size_t len = strlen(str) + 1; // Caracter nulo contado
-  wchar_t *wStr = malloc(len * sizeof(wchar_t));
+  wchar_t *wStr = calloc(len, sizeof(wchar_t));
   if (wStr == NULL) {
     return;
   }
@@ -126,6 +126,10 @@ char **obter_musica(char *nome_arquivo, int *n) {
   if (texto) {
     for (int i = 0; i < num_linhas; i++)
       normalizar_linha(texto[i]);
+  }
+
+  for (int i = 0; texto[i] != NULL; i++) {
+    printf("%d. %s\n", i, texto[i]);
   }
 
   return texto;

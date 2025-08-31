@@ -56,7 +56,6 @@ nodeFreq *inserirArvoreFreq(nodeFreq *no, const inf *dado_novo) {
   } else if (comparacao > 0) {
     no->right = inserirArvoreFreq(no->right, dado_novo);
   } else {
-    no->inf.freq_total += dado_novo->freq;
 
     if (dado_novo->freq > no->inf.freq) {
       free(no->inf.nome_musica);
